@@ -9,7 +9,7 @@
 
 using namespace std;
 
-const int    base_radius     = 5;
+const int    base_radius     = 10;
 const double precision       = 0.001;
 const int    precision_points = 1.0 / precision;
 
@@ -20,16 +20,17 @@ vector<pointI> basepoints;
 vector<pointD> tmppoints;
 vector<pointI> bezierpoints;
 
-auto        movingpoint       = basepoints.end();
-bool        isRenderSubbezier = false;
-bool        isCalculateBezier = true;
-double      subbezierT        = 0.5;
+auto        movingpoint          = basepoints.end();
+bool        isRenderSubbezier    = false;
+bool        isCalculateBezier    = true;
+bool        isCalculateSubbezier = false;
+double      subbezierT           = 0.5;
 
 namespace calculate
 {
 	auto findPointOnClickPos(int x, int y, int radius)
 	{
-		for (auto point = basepoints.begin(); point < basepoints.end(); point++)
+		for (auto point = basepoints.begin(); point < basepoints.end(); ++point)
 			if (((point->first + radius >= x) && (point->first - radius <= x))
 				&& ((point->second + radius >= y) && (point->second - radius <= y)))
 				return point;
@@ -49,9 +50,9 @@ namespace calculate
 			tmppoints[p] = basepoints[p];
 
 		int stacked = basepoints.size();
-		for (auto layer = basepoints.size() - 1; layer > 0; layer--)
+		for (auto layer = basepoints.size() - 1; layer > 0; --layer)
 		{
-			for (size_t point = stacked; point < stacked + layer; point++)
+			for (size_t point = stacked; point < stacked + layer; ++point)
 			{
 				tmppoints[point].first = tmppoints[point - layer - 1].first +
 					(tmppoints[point - layer].first - tmppoints[point - layer - 1].first) * t;
@@ -73,7 +74,7 @@ namespace calculate
 		bezierpoints.resize(precision_points + 1);
 
 		double t = 0.0;
-		for (int point = 0; point <= precision_points; point++, t += precision)
+		for (int point = 0; point <= precision_points; ++point, t += precision)
 			calculateBezierPoint(t, point);
 
 		isCalculateBezier = false;
@@ -85,14 +86,10 @@ namespace render
 {
 	void renderCircle(int x, int y, int radius)
 	{
-		glLineWidth(1);
-		glBegin(GL_LINE_LOOP);
+		glPointSize(radius);
+		glBegin(GL_POINTS);
 
-		for (int dx = -radius; dx <= radius; dx++)
-		{
-			glVertex2i(x + dx, y + sqrt(radius * radius - dx * dx));
-			glVertex2i(x + dx, y - sqrt(radius * radius - dx * dx));
-		}
+		glVertex2i(x, y);
 
 		glEnd();
 	}
@@ -123,7 +120,7 @@ namespace eventHandler
 		glLineWidth(2);
 		glBegin(GL_LINE_STRIP);
 
-		glColor3f(1.0, 1.0, 1.0);
+		glColor3ub(255, 255, 255);
 
 		for (auto p : basepoints)
 			glVertex2i(p.first, p.second);
@@ -133,41 +130,55 @@ namespace eventHandler
 		for (auto p : basepoints)
 			render::renderCircle(p.first, p.second, base_radius);
 
-		if (isRenderSubbezier)
+		if (isCalculateBezier)
+			calculate::calculateBezierCurve();
+
+		if (isRenderSubbezier && !basepoints.empty())
 		{
-			calculate::calculateBezierPoint(subbezierT, -1);
+			if (isCalculateSubbezier)
+			{
+				calculate::calculateBezierPoint(subbezierT, -1);
+				isCalculateSubbezier = false;
+			}
+
 			srand(0x12e15e35b500f16e);
 
 			int stacked = basepoints.size();
-			for (auto layer = basepoints.size() - 1; layer > 0; layer--)
+			for (auto layer = basepoints.size() - 1; layer > 1; --layer)
 			{
 				glBegin(GL_LINE_STRIP);
 				glColor3ub(rand() % 255, rand() % 255, rand() % 255);
 
-				for (int point = stacked; point < stacked + layer; point++)
+				for (int point = stacked; point < (stacked + layer); ++point)
 					glVertex2i(tmppoints[point].first, tmppoints[point].second);
 
 				glEnd();
 
-				for (int point = stacked; point < stacked + layer; point++)
-					render::renderCircle(tmppoints[point].first,
-						tmppoints[point].second, base_radius - 1);
+				for (int point = stacked; point < (stacked + layer); ++point)
+					render::renderCircle(tmppoints[point].first, tmppoints[point].second, base_radius - 1);
 
 				stacked += layer;
 			}
-		}
 
-		if(isCalculateBezier)
-			calculate::calculateBezierCurve();
+			glColor3ub(255, 0, 0);
+			render::renderCircle(tmppoints[stacked].first, tmppoints[stacked].second, base_radius+2);
+		}
 
 		glLineWidth(2);
 		glBegin(GL_LINE_STRIP);
 
-		glColor3f(1.0, 0, 0);
+		glColor3ub(255, 0, 0);
 		for (auto p : bezierpoints)
 			glVertex2i(p.first, p.second);
 
 		glEnd();
+
+		if (!basepoints.empty())
+		{
+			glColor3ub(255, 255, 255);
+			render::renderCircle(basepoints.begin()->first, basepoints.begin()->second, base_radius);
+			render::renderCircle(basepoints.end()[-1].first, basepoints.end()[-1].second, base_radius);
+		}
 	}
 
 	void mouse(GLFWwindow* window, int button, int action, int mode)
@@ -187,6 +198,7 @@ namespace eventHandler
 				movingpoint = basepoints.end();
 
 				isCalculateBezier = true;
+				isCalculateSubbezier = true;
 
 				return;
 			}
@@ -198,6 +210,7 @@ namespace eventHandler
 				movingpoint = basepoints.end();
 
 				isCalculateBezier = true;
+				isCalculateSubbezier = true;
 			}
 			else
 				movingpoint = point_on_click;
@@ -212,6 +225,7 @@ namespace eventHandler
 				movingpoint = basepoints.end();
 
 				isCalculateBezier = true;
+				isCalculateSubbezier = true;
 			}
 		}
 	}
@@ -221,15 +235,19 @@ namespace eventHandler
 		switch (key)
 		{
 		case GLFW_KEY_Q:
-			if(action == GLFW_PRESS)
+			if (action == GLFW_PRESS)
+			{
 				isRenderSubbezier = !isRenderSubbezier;
+				isCalculateSubbezier = true;
+			}
+
 			break;
 
 		case GLFW_KEY_A:
 			if ((subbezierT - precision) >= 0.0)
 			{
 				subbezierT -= precision;
-				isCalculateBezier = true;
+				isCalculateSubbezier = true;
 			}
 			break;
 
@@ -237,7 +255,7 @@ namespace eventHandler
 			if ((subbezierT + precision) <= 1.0)
 			{
 				subbezierT += precision;
-				isCalculateBezier = true;
+				isCalculateSubbezier = true;
 			}
 			break;
 
@@ -245,7 +263,7 @@ namespace eventHandler
 			if ((subbezierT + 0.01) <= 1.0)
 			{
 				subbezierT += 0.01;
-				isCalculateBezier = true;
+				isCalculateSubbezier = true;
 			}
 			break;
 
@@ -253,7 +271,7 @@ namespace eventHandler
 			if ((subbezierT - 0.01) >= 0.0)
 			{
 				subbezierT -= 0.01;
-				isCalculateBezier = true;
+				isCalculateSubbezier = true;
 			}
 			break;
 		}
@@ -267,9 +285,9 @@ int main(int argc, char* argv[])
 	if (!glfwInit())
 		return -1;
 	
-	glfwWindowHint(GLFW_SAMPLES, 4);
+	glfwWindowHint(GLFW_SAMPLES, 8);
 
-	GLFWwindow* window = glfwCreateWindow(800, 600, "Bezier curves", NULL, NULL);
+	GLFWwindow* window = glfwCreateWindow(1000, 800, "Bezier curves", NULL, NULL);
 	if (!window)
 	{
 		glfwTerminate();
@@ -281,10 +299,12 @@ int main(int argc, char* argv[])
 	glfwSetKeyCallback(window, eventHandler::keyboard);
 	glfwSetMouseButtonCallback(window, eventHandler::mouse);
 	glfwSwapInterval(1);
+	
+	glEnable(GL_POINT_SMOOTH);
+	glEnable(GL_LINE_SMOOTH);
+	glEnable(GL_MULTISAMPLE);		
 
-	glEnable(GL_MULTISAMPLE);
-
-	eventHandler::reshape(window, 800, 600);
+	eventHandler::reshape(window, 1000, 800);
 	while (!glfwWindowShouldClose(window))
 	{
 		glClear(GL_COLOR_BUFFER_BIT);
