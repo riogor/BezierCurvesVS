@@ -10,7 +10,7 @@
 using namespace std;
 
 const int    base_radius     = 10;
-const double precision       = 0.001;
+const double precision       = 0.0005;
 const int    precision_points = 1.0 / precision;
 
 typedef pair<int,    int>    pointI;
@@ -20,11 +20,14 @@ vector<pointI> basepoints;
 vector<pointD> tmppoints;
 vector<pointI> bezierpoints;
 
-auto        movingpoint          = basepoints.end();
-bool        isRenderSubbezier    = false;
-bool        isCalculateBezier    = true;
-bool        isCalculateSubbezier = false;
-double      subbezierT           = 0.5;
+int    width = 1000, height = 800;
+int    viewx = 0, viewy  = 0;
+
+auto   movingpoint          = basepoints.end();
+bool   isRenderSubbezier    = false;
+bool   isCalculateBezier    = true;
+bool   isCalculateSubbezier = false;
+double subbezierT           = 0.5;
 
 namespace calculate
 {
@@ -105,11 +108,14 @@ namespace eventHandler
 
 	void reshape(GLFWwindow* window, int w, int h)
 	{
-		glViewport(0, 0, w, h);
+		width = w;
+		height = h;
+
+		glViewport(0, 0, width, height);
 
 		glMatrixMode(GL_PROJECTION);
 		glLoadIdentity();
-		glOrtho(0, w, h, 0, -1, 1);
+		glOrtho(viewx, width+viewx, height+viewy, viewy, -1, 1);
 
 		glMatrixMode(GL_MODELVIEW);
 		glLoadIdentity();
@@ -161,7 +167,7 @@ namespace eventHandler
 			}
 
 			glColor3ub(255, 0, 0);
-			render::renderCircle(tmppoints[stacked].first, tmppoints[stacked].second, base_radius+2);
+			render::renderCircle(tmppoints[stacked].first, tmppoints[stacked].second, base_radius+1);
 		}
 
 		glLineWidth(2);
@@ -185,6 +191,8 @@ namespace eventHandler
 	{
 		double x, y;
 		glfwGetCursorPos(window, &x, &y);
+		x += viewx;
+		y += viewy;
 
 		if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS)
 		{
@@ -205,6 +213,7 @@ namespace eventHandler
 
 			if (point_on_click == basepoints.end())
 			{
+				cerr << x << " " << y << "\n";
 				basepoints.push_back({ x, y });
 
 				movingpoint = basepoints.end();
@@ -244,35 +253,63 @@ namespace eventHandler
 			break;
 
 		case GLFW_KEY_A:
-			if ((subbezierT - precision) >= 0.0)
-			{
-				subbezierT -= precision;
-				isCalculateSubbezier = true;
-			}
+			subbezierT = (subbezierT > precision ? subbezierT - precision : 0);
+			isCalculateSubbezier = true;
+
 			break;
 
 		case GLFW_KEY_D:
-			if ((subbezierT + precision) <= 1.0)
-			{
-				subbezierT += precision;
-				isCalculateSubbezier = true;
-			}
+			subbezierT = (subbezierT < 1.0 ? subbezierT + precision : 1.0);
+			isCalculateSubbezier = true;
+
 			break;
 
 		case GLFW_KEY_W:
-			if ((subbezierT + 0.01) <= 1.0)
-			{
-				subbezierT += 0.01;
-				isCalculateSubbezier = true;
-			}
+			subbezierT = (subbezierT < 1.0 ? subbezierT + 0.01 : 1.0);
+			isCalculateSubbezier = true;
+
 			break;
 
 		case GLFW_KEY_S:
-			if ((subbezierT - 0.01) >= 0.0)
-			{
-				subbezierT -= 0.01;
-				isCalculateSubbezier = true;
-			}
+			subbezierT = (subbezierT > 0.01 ? subbezierT - 0.01 : 0);
+			isCalculateSubbezier = true;
+
+			break;
+
+		case GLFW_KEY_UP:
+			viewy -= 10;
+
+			glMatrixMode(GL_PROJECTION);
+			glLoadIdentity();
+			glOrtho(viewx, width + viewx, height + viewy, viewy, -1, 1);
+
+			break;
+
+		case GLFW_KEY_DOWN:
+			viewy += 10;
+
+			glMatrixMode(GL_PROJECTION);
+			glLoadIdentity();
+			glOrtho(viewx, width + viewx, height + viewy, viewy, -1, 1);
+
+			break;
+
+		case GLFW_KEY_RIGHT:
+			viewx += 10;
+
+			glMatrixMode(GL_PROJECTION);
+			glLoadIdentity();
+			glOrtho(viewx, width + viewx, height + viewy, viewy, -1, 1);
+
+			break;
+
+		case GLFW_KEY_LEFT:
+			viewx -= 10;
+
+			glMatrixMode(GL_PROJECTION);
+			glLoadIdentity();
+			glOrtho(viewx, width + viewx, height + viewy, viewy, -1, 1);
+
 			break;
 		}
 	}
@@ -287,7 +324,7 @@ int main(int argc, char* argv[])
 	
 	glfwWindowHint(GLFW_SAMPLES, 8);
 
-	GLFWwindow* window = glfwCreateWindow(1000, 800, "Bezier curves", NULL, NULL);
+	GLFWwindow* window = glfwCreateWindow(width, height, "Bezier curves", NULL, NULL);
 	if (!window)
 	{
 		glfwTerminate();
@@ -304,7 +341,7 @@ int main(int argc, char* argv[])
 	glEnable(GL_LINE_SMOOTH);
 	glEnable(GL_MULTISAMPLE);		
 
-	eventHandler::reshape(window, 1000, 800);
+	eventHandler::reshape(window, width, height);
 	while (!glfwWindowShouldClose(window))
 	{
 		glClear(GL_COLOR_BUFFER_BIT);
