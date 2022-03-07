@@ -16,15 +16,16 @@ extern int       precision_points;
 typedef pair<int,    int>    pointI;
 typedef pair<double, double> pointD;
 
-extern vector<pointI> basepoints;
-extern vector<pointD> tmppoints;
-extern vector<pointI> bezierpoints;
+extern vector<pointI>         basepoints;
+extern vector<pointD>         tmppoints;
+extern vector<vector<pointI>> bezierpoints;
 
-extern int    width, height;
-extern int    viewx, viewy;
+extern int width, height;
+extern int viewx, viewy;
 
 extern decltype(basepoints.end()) movingpoint;
 
+extern int    bezierType;
 extern bool   isRenderSubbezier;
 extern bool   isCalculateBezier;
 extern bool   isCalculateSubbezier;

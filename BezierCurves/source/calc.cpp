@@ -11,44 +11,63 @@ decltype(basepoints.end()) findPointOnClickPos(int x, int y, int radius)
 	return basepoints.end();
 }
 
-void calculateBezierPoint(double t, int point)
+void calculateBezierPoint(const double t, const int point, const int group)
 {
 	if (basepoints.empty())
 		return;
 
+	int group_size = (bezierType == 1 ? basepoints.size() : bezierType+1);
+
 	tmppoints.clear();
-	tmppoints.resize((basepoints.size() * (basepoints.size() + 1)) / 2);
+	tmppoints.resize((group_size * (group_size + 1)) / 2);
 
-	for (int p = 0; p < basepoints.size(); p++)
-		tmppoints[p] = basepoints[p];
+	int st = group * group_size - (group != 0)*group;
+	for (int p = st; p < st + group_size; p++)
+		tmppoints[p - st] = basepoints[p];
 
-	int stacked = basepoints.size();
-	for (auto layer = basepoints.size() - 1; layer > 0; --layer)
+	int stacked = group_size;
+	for (auto layer = group_size - 1; layer > 0; --layer)
 	{
-		for (size_t point = stacked; point < stacked + layer; ++point)
+		for (size_t layer_point = stacked; layer_point < stacked + layer; ++layer_point)
 		{
-			tmppoints[point].first = tmppoints[point - layer - 1].first +
-				(tmppoints[point - layer].first - tmppoints[point - layer - 1].first) * t;
+			tmppoints[layer_point].first = tmppoints[layer_point - layer - 1].first +
+				(tmppoints[layer_point - layer].first - tmppoints[layer_point - layer - 1].first) * t;
 
-			tmppoints[point].second = tmppoints[point - layer - 1].second +
-				(tmppoints[point - layer].second - tmppoints[point - layer - 1].second) * t;
+			tmppoints[layer_point].second = tmppoints[layer_point - layer - 1].second +
+				(tmppoints[layer_point - layer].second - tmppoints[layer_point - layer - 1].second) * t;
 		}
 
 		stacked += layer;
 	}
 
 	if (point != -1) //calculating subbezier
-		bezierpoints[point] = tmppoints.end()[-1];
+		bezierpoints[group][point] = tmppoints.end()[-1];
 }
 
 void calculateBezierCurve()
 {
-	bezierpoints.clear();
-	bezierpoints.resize(precision_points + 1);
+	if (basepoints.empty())
+		return;
 
-	double t = 0.0;
-	for (int point = 0; point <= precision_points; ++point, t += precision)
-		calculateBezierPoint(t, point);
+	bezierpoints.clear();
+	if (bezierType == 1)
+	{
+		bezierpoints.resize(1);
+		bezierpoints[0].resize(precision_points + 1);
+	}
+	else
+	{
+		bezierpoints.resize((basepoints.size()-1) / bezierType);
+		for (auto& group : bezierpoints)
+			group.resize(precision_points + 1);
+	}
+
+	for (int group = 0; group < (bezierType == 1 ? 1 : (basepoints.size()-1) / bezierType); ++group)
+	{
+		double t = 0.0;
+		for (int point = 0; point <= precision_points; ++point, t += precision)
+			calculateBezierPoint(t, point, group);
+	}
 
 	isCalculateBezier = false;
 }

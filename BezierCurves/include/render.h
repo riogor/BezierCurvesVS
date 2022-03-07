@@ -2,7 +2,7 @@
 
 #include "pch.h"
 
-void renderCircle(int x, int y, int radius);
+void renderCircle(const int x, const int y, const int radius);
 
 void renderBezierBase();
 void renderBezierCurve();

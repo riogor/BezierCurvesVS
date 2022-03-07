@@ -4,5 +4,5 @@
 
 decltype(basepoints.end()) findPointOnClickPos(int x, int y, int radius);
 
-void calculateBezierPoint(double t, int point);
+void calculateBezierPoint(const double t, const int point, const int group);
 void calculateBezierCurve();

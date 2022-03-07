@@ -31,11 +31,11 @@ void display()
 	if (isCalculateBezier)
 		calculateBezierCurve();
 
-	if (isRenderSubbezier && !basepoints.empty())
+	if (bezierType == 1 && isRenderSubbezier && !basepoints.empty())
 	{
 		if (isCalculateSubbezier)
 		{
-			calculateBezierPoint(subbezierT, -1);
+			calculateBezierPoint(subbezierT, -1, 0);
 			isCalculateSubbezier = false;
 		}
 
@@ -104,7 +104,7 @@ void keyboard(GLFWwindow* window, int key, int scancode, int action, int mode)
 	case GLFW_KEY_Q:
 		if (action == GLFW_PRESS)
 		{
-			isRenderSubbezier = !isRenderSubbezier;
+			isRenderSubbezier    = !isRenderSubbezier;
 			isCalculateSubbezier = true;
 		}
 
@@ -116,6 +116,31 @@ void keyboard(GLFWwindow* window, int key, int scancode, int action, int mode)
 		isCalculateBezier = true;
 		isCalculateSubbezier = true;
 
+		break;
+
+	case GLFW_KEY_1:
+		if (action == GLFW_PRESS)
+		{
+			bezierType = 1;
+			isCalculateSubbezier = true;
+			isCalculateBezier    = true;
+		}
+		break;
+
+	case GLFW_KEY_2:
+		if (action == GLFW_PRESS)
+		{
+			bezierType = 2;
+			isCalculateBezier = true;
+		}
+		break;
+
+	case GLFW_KEY_3:
+		if (action == GLFW_PRESS)
+		{
+			bezierType = 3;
+			isCalculateBezier = true;
+		}
 		break;
 
 	case GLFW_KEY_A:

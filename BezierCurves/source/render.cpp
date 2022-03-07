@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "render.h"
 
-void renderCircle(int x, int y, int radius)
+void renderCircle(const int x, const int y, const int radius)
 {
 	glPointSize(radius);
 	glBegin(GL_POINTS);
@@ -32,8 +32,9 @@ void renderBezierCurve()
 	glColor3ub(255, 0, 0);
 	glBegin(GL_LINE_STRIP);
 
-	for (auto& p : bezierpoints)
-		glVertex2i(p.first, p.second);
+	for(auto& points : bezierpoints)
+		for (auto& p : points)
+			glVertex2i(p.first, p.second);
 
 	glEnd();
 
