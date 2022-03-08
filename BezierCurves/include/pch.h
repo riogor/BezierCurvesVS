@@ -13,6 +13,7 @@
 
 using namespace std;
 
+extern bool  isRenderGrid;
 extern bool  isRenderBase;
 
 extern const int max_field;

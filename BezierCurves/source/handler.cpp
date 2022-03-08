@@ -26,6 +26,9 @@ void reshape(GLFWwindow* window, int w, int h)
 
 void renderGraphics()
 {
+	if (isRenderGrid)
+		renderGrid(100);
+
 	if(isRenderBase)
 		renderBezierBase();
 
@@ -100,7 +103,7 @@ void keyboard(GLFWwindow* window, int key, int scancode, int action, int mode)
 	{
 
 	case GLFW_KEY_UP:
-		viewy -= 10;
+		viewy = (viewy - 10 >= -height * max_field ? viewy - 10 : -height * max_field);
 
 		glMatrixMode(GL_PROJECTION);
 		glLoadIdentity();
@@ -109,7 +112,7 @@ void keyboard(GLFWwindow* window, int key, int scancode, int action, int mode)
 		break;
 
 	case GLFW_KEY_DOWN:
-		viewy += 10;
+		viewy = (viewy + 10 <= height * max_field-height ? viewy + 10 : height * max_field-height);
 
 		glMatrixMode(GL_PROJECTION);
 		glLoadIdentity();
@@ -118,7 +121,7 @@ void keyboard(GLFWwindow* window, int key, int scancode, int action, int mode)
 		break;
 
 	case GLFW_KEY_RIGHT:
-		viewx += 10;
+		viewx = (viewx + 10 <= width * max_field-width ? viewx + 10 : width * max_field-width);
 
 		glMatrixMode(GL_PROJECTION);
 		glLoadIdentity();
@@ -127,7 +130,7 @@ void keyboard(GLFWwindow* window, int key, int scancode, int action, int mode)
 		break;
 
 	case GLFW_KEY_LEFT:
-		viewx -= 10;
+		viewx = (viewx - 10 >= -width * max_field ? viewx - 10 : -width * max_field);
 
 		glMatrixMode(GL_PROJECTION);
 		glLoadIdentity();

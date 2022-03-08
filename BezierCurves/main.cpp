@@ -65,8 +65,8 @@ int main()
 
 		if (show_controls)
 		{
-			ImGui::SetNextWindowSize(ImVec2(350, 400));
-			ImGui::Begin(u8"Панель", (bool*)0, ImGuiWindowFlags_NoResize);
+			ImGui::SetNextWindowSize(ImVec2(350, 250));
+			ImGui::Begin(u8"Панель управления", (bool*)0, ImGuiWindowFlags_NoResize);
 
 				ImGui::Text(u8"Тип кривой:");
 				if (ImGui::RadioButton(u8"Обычная", &bezierType, 1))
@@ -97,6 +97,7 @@ int main()
 				}
 				ImGui::Separator();
 
+				ImGui::Checkbox(u8"Показать сетку", &isRenderGrid);
 				ImGui::Checkbox(u8"Показать опорные точки", &isRenderBase);
 				if (ImGui::Button(u8"Стереть всё", ImVec2(100, 20)))
 				{

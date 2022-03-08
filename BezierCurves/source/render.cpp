@@ -11,6 +11,27 @@ void renderCircle(const int x, const int y, const int radius)
 	glEnd();
 }
 
+void renderGrid(const int gap)
+{
+	glLineWidth(1);
+	glColor3ub(55, 55, 55);
+	glBegin(GL_LINES);
+
+	for (int i = -width * max_field; i <= width * max_field; i += gap)
+	{
+		glVertex2i(i, height * max_field);
+		glVertex2i(i, -height * max_field);
+	}
+
+	for (int i = -height * max_field; i <= height * max_field; i += gap)
+	{
+		glVertex2i(width * max_field, i);
+		glVertex2i(-width * max_field, i);
+	}
+
+	glEnd();
+}
+
 void renderBezierBase()
 {
 	glLineWidth(2);

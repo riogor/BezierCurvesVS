@@ -1,5 +1,6 @@
 #include "pch.h"
 
+bool  isRenderGrid      = true;
 bool  isRenderBase      = true;
 
 const int max_field        = 5;
