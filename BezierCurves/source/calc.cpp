@@ -3,6 +3,9 @@
 
 decltype(basepoints.end()) findPointOnClickPos(int x, int y, int radius)
 {
+	if (basepoints.empty())
+		return basepoints.end();
+
 	for (auto point = basepoints.begin(); point < basepoints.end(); ++point)
 		if (((point->first + radius >= x) && (point->first - radius <= x))
 			&& ((point->second + radius >= y) && (point->second - radius <= y)))
@@ -46,10 +49,12 @@ void calculateBezierPoint(const double t, const int point, const int group)
 
 void calculateBezierCurve()
 {
+	bezierpoints.clear();
+	isCalculateBezier = false;
+
 	if (basepoints.empty())
 		return;
 
-	bezierpoints.clear();
 	if (bezierType == 1)
 	{
 		bezierpoints.resize(1);
@@ -68,6 +73,4 @@ void calculateBezierCurve()
 		for (int point = 0; point <= precision_points; ++point, t += precision)
 			calculateBezierPoint(t, point, group);
 	}
-
-	isCalculateBezier = false;
 }

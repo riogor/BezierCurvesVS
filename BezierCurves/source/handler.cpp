@@ -24,20 +24,17 @@ void reshape(GLFWwindow* window, int w, int h)
 	glLoadIdentity();
 }
 
-void display()
+void renderGraphics()
 {
-	renderBezierBase();
+	if(isRenderBase)
+		renderBezierBase();
 
 	if (isCalculateBezier)
 		calculateBezierCurve();
 
 	if (bezierType == 1 && isRenderSubbezier && !basepoints.empty())
 	{
-		if (isCalculateSubbezier)
-		{
-			calculateBezierPoint(subbezierT, -1, 0);
-			isCalculateSubbezier = false;
-		}
+		calculateBezierPoint(subbezierT, -1, 0);
 
 		renderSubbezier();
 	}
@@ -52,46 +49,47 @@ void mouse(GLFWwindow* window, int button, int action, int mode)
 	x += viewx;
 	y += viewy;
 
-	if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS)
+	ImGuiIO& io = ImGui::GetIO();
+	if (io.WantCaptureMouse == 0 && action == GLFW_PRESS)
 	{
-		auto point_on_click = findPointOnClickPos(x, y, base_radius);
-
-		if (movingpoint != basepoints.end())
+		if (button == GLFW_MOUSE_BUTTON_LEFT)
 		{
-			movingpoint->first = x;
-			movingpoint->second = y;
+			auto point_on_click = findPointOnClickPos(x, y, base_radius);
 
-			movingpoint = basepoints.end();
+			if (movingpoint != basepoints.end())
+			{
+				movingpoint->first = x;
+				movingpoint->second = y;
 
-			isCalculateBezier = true;
-			isCalculateSubbezier = true;
+				movingpoint = basepoints.end();
 
-			return;
+				isCalculateBezier = true;
+
+				return;
+			}
+
+			if (point_on_click == basepoints.end())
+			{
+				basepoints.push_back({ x, y });
+
+				movingpoint = basepoints.end();
+
+				isCalculateBezier = true;
+			}
+			else
+				movingpoint = point_on_click;
 		}
-
-		if (point_on_click == basepoints.end())
+		else if (button == GLFW_MOUSE_BUTTON_RIGHT)
 		{
-			basepoints.push_back({ x, y });
+			auto point_on_click = findPointOnClickPos(x, y, base_radius);
+			if (point_on_click != basepoints.end())
+			{
+				basepoints.erase(point_on_click);
 
-			movingpoint = basepoints.end();
+				movingpoint = basepoints.end();
 
-			isCalculateBezier = true;
-			isCalculateSubbezier = true;
-		}
-		else
-			movingpoint = point_on_click;
-	}
-	else if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS)
-	{
-		auto point_on_click = findPointOnClickPos(x, y, base_radius);
-		if (point_on_click != basepoints.end())
-		{
-			basepoints.erase(point_on_click);
-
-			movingpoint = basepoints.end();
-
-			isCalculateBezier = true;
-			isCalculateSubbezier = true;
+				isCalculateBezier = true;
+			}
 		}
 	}
 }
@@ -100,72 +98,6 @@ void keyboard(GLFWwindow* window, int key, int scancode, int action, int mode)
 {
 	switch (key)
 	{
-
-	case GLFW_KEY_Q:
-		if (action == GLFW_PRESS)
-		{
-			isRenderSubbezier    = !isRenderSubbezier;
-			isCalculateSubbezier = true;
-		}
-
-		break;
-
-	case GLFW_KEY_E:
-		basepoints.clear();
-		movingpoint = basepoints.end();
-		isCalculateBezier = true;
-		isCalculateSubbezier = true;
-
-		break;
-
-	case GLFW_KEY_1:
-		if (action == GLFW_PRESS)
-		{
-			bezierType = 1;
-			isCalculateSubbezier = true;
-			isCalculateBezier    = true;
-		}
-		break;
-
-	case GLFW_KEY_2:
-		if (action == GLFW_PRESS)
-		{
-			bezierType = 2;
-			isCalculateBezier = true;
-		}
-		break;
-
-	case GLFW_KEY_3:
-		if (action == GLFW_PRESS)
-		{
-			bezierType = 3;
-			isCalculateBezier = true;
-		}
-		break;
-
-	case GLFW_KEY_A:
-		subbezierT = (subbezierT > precision ? subbezierT - precision : 0);
-		isCalculateSubbezier = true;
-
-		break;
-
-	case GLFW_KEY_D:
-		subbezierT = (subbezierT < 1.0 ? subbezierT + precision : 1.0);
-		isCalculateSubbezier = true;
-
-		break;
-
-	case GLFW_KEY_W:
-		subbezierT = (subbezierT < 1.0 ? subbezierT + 0.01 : 1.0);
-		isCalculateSubbezier = true;
-
-		break;
-
-	case GLFW_KEY_S:
-		subbezierT = (subbezierT > 0.01 ? subbezierT - 0.01 : 0);
-		isCalculateSubbezier = true;
-
-		break;
 
 	case GLFW_KEY_UP:
 		viewy -= 10;
