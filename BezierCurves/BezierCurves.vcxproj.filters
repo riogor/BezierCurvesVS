@@ -57,6 +57,9 @@
     <ClCompile Include="..\submodules\imgui\backends\imgui_impl_opengl2.cpp">
       <Filter>Исходные файлы\ImGui</Filter>
     </ClCompile>
+    <ClCompile Include="source\files.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\calc.h">
@@ -94,6 +97,9 @@
     </ClInclude>
     <ClInclude Include="..\submodules\imgui\backends\imgui_impl_opengl2.h">
       <Filter>Файлы заголовков\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="include\files.h">
+      <Filter>Файлы заголовков</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

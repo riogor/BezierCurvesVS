@@ -63,6 +63,7 @@
     </ClCompile>
     <ClCompile Include="main.cpp" />
     <ClCompile Include="source\calc.cpp" />
+    <ClCompile Include="source\files.cpp" />
     <ClCompile Include="source\handler.cpp" />
     <ClCompile Include="source\pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
@@ -82,6 +83,7 @@
     <ClInclude Include="..\submodules\imgui\imstb_textedit.h" />
     <ClInclude Include="..\submodules\imgui\imstb_truetype.h" />
     <ClInclude Include="include\calc.h" />
+    <ClInclude Include="include\files.h" />
     <ClInclude Include="include\handler.h" />
     <ClInclude Include="include\pch.h" />
     <ClInclude Include="include\render.h" />

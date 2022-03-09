@@ -53,7 +53,7 @@ void mouse(GLFWwindow* window, int button, int action, int mode)
 	y += viewy;
 
 	ImGuiIO& io = ImGui::GetIO();
-	if (io.WantCaptureMouse == 0 && action == GLFW_PRESS)
+	if (!io.WantCaptureMouse && action == GLFW_PRESS)
 	{
 		if (button == GLFW_MOUSE_BUTTON_LEFT)
 		{
@@ -99,11 +99,15 @@ void mouse(GLFWwindow* window, int button, int action, int mode)
 
 void keyboard(GLFWwindow* window, int key, int scancode, int action, int mode)
 {
+	ImGuiIO& io = ImGui::GetIO();
+	if (io.WantCaptureKeyboard)
+		return;
+
 	switch (key)
 	{
 
 	case GLFW_KEY_UP:
-		viewy = (viewy - 10 >= -height * max_field ? viewy - 10 : -height * max_field);
+		viewy = (viewy - step_size >= -height * max_field ? viewy - step_size : -height * max_field);
 
 		glMatrixMode(GL_PROJECTION);
 		glLoadIdentity();
@@ -112,7 +116,7 @@ void keyboard(GLFWwindow* window, int key, int scancode, int action, int mode)
 		break;
 
 	case GLFW_KEY_DOWN:
-		viewy = (viewy + 10 <= height * max_field-height ? viewy + 10 : height * max_field-height);
+		viewy = (viewy + step_size <= height * max_field-height ? viewy + step_size : height * max_field-height);
 
 		glMatrixMode(GL_PROJECTION);
 		glLoadIdentity();
@@ -121,7 +125,7 @@ void keyboard(GLFWwindow* window, int key, int scancode, int action, int mode)
 		break;
 
 	case GLFW_KEY_RIGHT:
-		viewx = (viewx + 10 <= width * max_field-width ? viewx + 10 : width * max_field-width);
+		viewx = (viewx + step_size <= width * max_field-width ? viewx + step_size : width * max_field-width);
 
 		glMatrixMode(GL_PROJECTION);
 		glLoadIdentity();
@@ -130,7 +134,7 @@ void keyboard(GLFWwindow* window, int key, int scancode, int action, int mode)
 		break;
 
 	case GLFW_KEY_LEFT:
-		viewx = (viewx - 10 >= -width * max_field ? viewx - 10 : -width * max_field);
+		viewx = (viewx - step_size >= -width * max_field ? viewx - step_size : -width * max_field);
 
 		glMatrixMode(GL_PROJECTION);
 		glLoadIdentity();

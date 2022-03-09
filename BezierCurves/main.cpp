@@ -1,6 +1,7 @@
 #include <pch.h>
 
 #include <handler.h>
+#include <files.h>
 
 int main()
 {
@@ -43,7 +44,10 @@ int main()
 	ImGui_ImplOpenGL2_Init();
 
 	int ui_precision_points = precision_points;
+	bool show_save     = false, show_load     = false;
 	bool show_controls = false, show_settings = false;
+	bool show_error    = false;
+	char buf[1000] = {};
 
 	while (!glfwWindowShouldClose(window))
 	{
@@ -57,15 +61,64 @@ int main()
 		ImGui::PushFont(rus);
 
 		ImGui::BeginMainMenuBar();
-		if (ImGui::Button(u8"Управление"))
-			show_controls = !show_controls;
-		if (ImGui::Button(u8"Настройки"))
-			show_settings = !show_settings;
+
+			if (ImGui::Button(u8"Сохранить"))
+				show_save = !show_save;
+			if (ImGui::Button(u8"Загрузить"))
+				show_load = !show_load;
+			if (ImGui::Button(u8"Управление"))
+				show_controls = !show_controls;
+			if (ImGui::Button(u8"Настройки"))
+				show_settings = !show_settings;
+
 		ImGui::EndMainMenuBar();
+
+		if (show_save)
+		{
+			ImGui::SetNextWindowSize(ImVec2());
+			ImGui::Begin(u8"Сохранить в файл", (bool*)0, ImGuiWindowFlags_NoResize);
+				
+				ImGui::InputText(u8"Имя файла", buf, 1000);
+
+				if (ImGui::Button(u8"Сохранить"))
+				{
+					saveInFile(string(buf));
+
+					show_save = false;
+					memset(buf, 0, 1000 * sizeof(char));
+				}
+
+			ImGui::End();
+		}
+
+		if (show_load)
+		{
+			ImGui::SetNextWindowSize(ImVec2());
+			ImGui::Begin(u8"Загрузить из файла", (bool*)0, ImGuiWindowFlags_NoResize);
+
+			if (ImGui::InputText(u8"Имя файла", buf, 1000))
+				show_error = false;
+
+			if (ImGui::Button(u8"Загрузить"))
+			{
+				if (readFromFile(string(buf)))
+				{
+					show_load = false;
+					memset(buf, 0, 1000 * sizeof(char));
+				}
+				else
+					show_error = true;
+			}
+
+			if(show_error)
+				ImGui::TextColored(ImVec4(255, 0, 0, 1), u8"Ошибка при загрузке из файла!\nПроверьте название\nи правильность формата");
+
+			ImGui::End();
+		}
 
 		if (show_controls)
 		{
-			ImGui::SetNextWindowSize(ImVec2(350, 250));
+			ImGui::SetNextWindowSize(ImVec2());
 			ImGui::Begin(u8"Панель управления", (bool*)0, ImGuiWindowFlags_NoResize);
 
 				ImGui::Text(u8"Тип кривой:");
@@ -84,13 +137,13 @@ int main()
 				ImGui::Separator();
 
 				ImGui::Text(u8"Навигация");
-				if (ImGui::Button(u8"Домой", ImVec2(50, 20)))
+				if (ImGui::Button(u8"Домой", ImVec2()))
 				{
 					viewx = -width/2;
 					viewy = -height/2;
 				}
 				ImGui::SameLine();
-				if (ImGui::Button(u8"К кривой", ImVec2(70, 20)) && !basepoints.empty())
+				if (ImGui::Button(u8"К кривой", ImVec2()) && !basepoints.empty())
 				{
 					viewx = basepoints[0].first - width/2;
 					viewy = basepoints[0].second - height/2;
@@ -99,7 +152,7 @@ int main()
 
 				ImGui::Checkbox(u8"Показать сетку", &isRenderGrid);
 				ImGui::Checkbox(u8"Показать опорные точки", &isRenderBase);
-				if (ImGui::Button(u8"Стереть всё", ImVec2(100, 20)))
+				if (ImGui::Button(u8"Стереть всё", ImVec2()))
 				{
 					basepoints.clear();
 					movingpoint = basepoints.end();
@@ -111,21 +164,21 @@ int main()
 
 		if (show_settings)
 		{
-			ImGui::SetNextWindowSize(ImVec2(280, 110));
+			ImGui::SetNextWindowSize(ImVec2());
 			ImGui::Begin(u8"Настройки", (bool*)0, ImGuiWindowFlags_NoResize);
 
 				ImGui::SliderInt(u8"Цвет сетки", &grid_col, 0, 255);
 				ImGui::Separator();
 
 				ImGui::SliderInt(u8"Точность", &ui_precision_points, 100, 5000);
-				if (ImGui::Button(u8"Применить", ImVec2(80, 20)))
+				if (ImGui::Button(u8"Применить", ImVec2()))
 				{
 					precision_points = ui_precision_points;
 					precision = 1.0 / (double)precision_points;
 					isCalculateBezier = true;
 				}
 				ImGui::SameLine();
-				if (ImGui::Button(u8"Сброс", ImVec2(50, 20)))
+				if (ImGui::Button(u8"Сброс", ImVec2()))
 				{
 					precision_points = 2000;
 					ui_precision_points = 2000;
