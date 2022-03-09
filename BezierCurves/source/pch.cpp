@@ -5,6 +5,7 @@ bool  isRenderBase      = true;
 
 const int max_field        = 5;
 const int base_radius      = 10;
+int       grid_col         = 55;
 double    precision        = 0.0005;
 int       precision_points = 1.0 / precision;
 

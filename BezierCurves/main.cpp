@@ -111,11 +111,13 @@ int main()
 
 		if (show_settings)
 		{
-			ImGui::SetNextWindowSize(ImVec2(250, 80));
+			ImGui::SetNextWindowSize(ImVec2(280, 110));
 			ImGui::Begin(u8"Настройки", (bool*)0, ImGuiWindowFlags_NoResize);
 
-				ImGui::SliderInt(u8"Точность", &ui_precision_points, 100, 5000);
+				ImGui::SliderInt(u8"Цвет сетки", &grid_col, 0, 255);
+				ImGui::Separator();
 
+				ImGui::SliderInt(u8"Точность", &ui_precision_points, 100, 5000);
 				if (ImGui::Button(u8"Применить", ImVec2(80, 20)))
 				{
 					precision_points = ui_precision_points;

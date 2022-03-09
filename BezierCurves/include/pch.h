@@ -18,6 +18,7 @@ extern bool  isRenderBase;
 
 extern const int max_field;
 extern const int base_radius;
+extern int       grid_col;
 extern double    precision;
 extern int       precision_points;
 

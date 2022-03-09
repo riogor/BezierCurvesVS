@@ -14,7 +14,7 @@ void renderCircle(const int x, const int y, const int radius)
 void renderGrid(const int gap)
 {
 	glLineWidth(1);
-	glColor3ub(55, 55, 55);
+	glColor3ub(grid_col, grid_col, grid_col);
 	glBegin(GL_LINES);
 
 	for (int i = -width * max_field; i <= width * max_field; i += gap)
