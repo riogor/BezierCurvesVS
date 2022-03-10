@@ -139,11 +139,12 @@ int main()
 					isCalculateBezier = true;
 				ImGui::Separator();
 
+				ImGui::Text(u8"Подкривые:");
 				ImGui::Checkbox(u8"Показать подкривые", &isRenderSubbezier);
 				ImGui::SliderFloat("T", &subbezierT, 0.0f, 1.0f);
 				ImGui::Separator();
 
-				ImGui::Text(u8"Навигация");
+				ImGui::Text(u8"Навигация:");
 				if (ImGui::Button(u8"Домой", ImVec2()))
 				{
 					viewx = -width / 2;
