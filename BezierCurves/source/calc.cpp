@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "calc.h"
 
-decltype(basepoints.end()) findPointOnClickPos(int x, int y, int radius)
+decltype(basepoints.end()) findPointOnClickPos(const int x, const int y, const int radius)
 {
 	if (basepoints.empty())
 		return basepoints.end();
@@ -31,7 +31,7 @@ void calculateBezierPoint(const double t, const int point, const int group)
 	int stacked = group_size;
 	for (auto layer = group_size - 1; layer > 0; --layer)
 	{
-		for (size_t layer_point = stacked; layer_point < stacked + layer; ++layer_point)
+		for (int layer_point = stacked; layer_point < stacked + layer; ++layer_point)
 		{
 			tmppoints[layer_point].first = tmppoints[layer_point - layer - 1].first +
 				(tmppoints[layer_point - layer].first - tmppoints[layer_point - layer - 1].first) * t;
@@ -44,7 +44,7 @@ void calculateBezierPoint(const double t, const int point, const int group)
 	}
 
 	if (point != -1) //calculating subbezier
-		bezierpoints[group][point] = tmppoints.end()[-1];
+		bezierpoints[group][point] = static_cast<pointI>(tmppoints.end()[-1]);
 }
 
 void calculateBezierCurve()

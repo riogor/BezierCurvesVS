@@ -2,9 +2,9 @@
 
 #include "pch.h"
 
-bool readFromFile(string path);
+bool readFromFile(char* path);
 
-void saveInFile(string path);
+bool saveInFile(char* path);
 
 /*
 File format:

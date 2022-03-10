@@ -57,12 +57,12 @@ void mouse(GLFWwindow* window, int button, int action, int mode)
 	{
 		if (button == GLFW_MOUSE_BUTTON_LEFT)
 		{
-			auto point_on_click = findPointOnClickPos(x, y, base_radius);
+			auto point_on_click = findPointOnClickPos((int)x, (int)y, base_radius);
 
 			if (movingpoint != basepoints.end())
 			{
-				movingpoint->first = x;
-				movingpoint->second = y;
+				movingpoint->first = (int)x;
+				movingpoint->second = (int)y;
 
 				movingpoint = basepoints.end();
 
@@ -73,7 +73,7 @@ void mouse(GLFWwindow* window, int button, int action, int mode)
 
 			if (point_on_click == basepoints.end())
 			{
-				basepoints.push_back({ x, y });
+				basepoints.push_back({ (int)x, (int)y });
 
 				movingpoint = basepoints.end();
 
@@ -84,7 +84,7 @@ void mouse(GLFWwindow* window, int button, int action, int mode)
 		}
 		else if (button == GLFW_MOUSE_BUTTON_RIGHT)
 		{
-			auto point_on_click = findPointOnClickPos(x, y, base_radius);
+			auto point_on_click = findPointOnClickPos((int)x, (int)y, base_radius);
 			if (point_on_click != basepoints.end())
 			{
 				basepoints.erase(point_on_click);

@@ -37,7 +37,7 @@ int main()
 	io.IniFilename = nullptr;
 
 	io.Fonts->Clear();
-	ImFont* rus = io.Fonts->AddFontFromFileTTF("fonts/consolas.ttf", 14.f, NULL,
+	ImFont* rus = io.Fonts->AddFontFromFileTTF("fonts/consolas.ttf", 16.f, NULL,
 		ImGui::GetIO().Fonts->GetGlyphRangesCyrillic());
 
 	ImGui_ImplGlfw_InitForOpenGL(window, true);
@@ -46,7 +46,7 @@ int main()
 	int ui_precision_points = precision_points;
 	bool show_save     = false, show_load     = false;
 	bool show_controls = false, show_settings = false;
-	bool show_error    = false;
+	bool show_error_save = false, show_error_load = false;
 	char buf[1000] = {};
 
 	while (!glfwWindowShouldClose(window))
@@ -61,7 +61,7 @@ int main()
 		ImGui::PushFont(rus);
 
 		ImGui::BeginMainMenuBar();
-
+		{
 			if (ImGui::Button(u8"Сохранить"))
 				show_save = !show_save;
 			if (ImGui::Button(u8"Загрузить"))
@@ -70,24 +70,31 @@ int main()
 				show_controls = !show_controls;
 			if (ImGui::Button(u8"Настройки"))
 				show_settings = !show_settings;
-
+		}
 		ImGui::EndMainMenuBar();
 
 		if (show_save)
 		{
 			ImGui::SetNextWindowSize(ImVec2());
 			ImGui::Begin(u8"Сохранить в файл", (bool*)0, ImGuiWindowFlags_NoResize);
-				
-				ImGui::InputText(u8"Имя файла", buf, 1000);
+			{
+				if (ImGui::InputText(u8"Имя файла", buf, 1000))
+					show_error_save = false;
 
 				if (ImGui::Button(u8"Сохранить"))
 				{
-					saveInFile(string(buf));
-
-					show_save = false;
-					memset(buf, 0, 1000 * sizeof(char));
+					if (saveInFile(buf))
+					{
+						show_save = false;
+						memset(buf, 0, 1000 * sizeof(char));
+					}
+					else
+						show_error_save = true;
 				}
 
+				if (show_error_save)
+					ImGui::TextColored(ImVec4(255, 25, 25, 1), u8"Ошибка при сохранении!");
+			}
 			ImGui::End();
 		}
 
@@ -95,24 +102,24 @@ int main()
 		{
 			ImGui::SetNextWindowSize(ImVec2());
 			ImGui::Begin(u8"Загрузить из файла", (bool*)0, ImGuiWindowFlags_NoResize);
-
-			if (ImGui::InputText(u8"Имя файла", buf, 1000))
-				show_error = false;
-
-			if (ImGui::Button(u8"Загрузить"))
 			{
-				if (readFromFile(string(buf)))
+				if (ImGui::InputText(u8"Имя файла", buf, 1000))
+					show_error_load = false;
+
+				if (ImGui::Button(u8"Загрузить"))
 				{
-					show_load = false;
-					memset(buf, 0, 1000 * sizeof(char));
+					if (readFromFile(buf))
+					{
+						show_load = false;
+						memset(buf, 0, 1000 * sizeof(char));
+					}
+					else
+						show_error_load = true;
 				}
-				else
-					show_error = true;
+
+				if (show_error_load)
+					ImGui::TextColored(ImVec4(255, 25, 25, 1), u8"Ошибка при загрузке из файла!\nПроверьте название\nи правильность формата");
 			}
-
-			if(show_error)
-				ImGui::TextColored(ImVec4(255, 0, 0, 1), u8"Ошибка при загрузке из файла!\nПроверьте название\nи правильность формата");
-
 			ImGui::End();
 		}
 
@@ -120,7 +127,7 @@ int main()
 		{
 			ImGui::SetNextWindowSize(ImVec2());
 			ImGui::Begin(u8"Панель управления", (bool*)0, ImGuiWindowFlags_NoResize);
-
+			{
 				ImGui::Text(u8"Тип кривой:");
 				if (ImGui::RadioButton(u8"Обычная", &bezierType, 1))
 					isCalculateBezier = true;
@@ -139,14 +146,14 @@ int main()
 				ImGui::Text(u8"Навигация");
 				if (ImGui::Button(u8"Домой", ImVec2()))
 				{
-					viewx = -width/2;
-					viewy = -height/2;
+					viewx = -width / 2;
+					viewy = -height / 2;
 				}
 				ImGui::SameLine();
 				if (ImGui::Button(u8"К кривой", ImVec2()) && !basepoints.empty())
 				{
-					viewx = basepoints[0].first - width/2;
-					viewy = basepoints[0].second - height/2;
+					viewx = basepoints[0].first - width / 2;
+					viewy = basepoints[0].second - height / 2;
 				}
 				ImGui::Separator();
 
@@ -158,7 +165,7 @@ int main()
 					movingpoint = basepoints.end();
 					isCalculateBezier = true;
 				}
-
+			}
 			ImGui::End();
 		}
 
@@ -166,7 +173,7 @@ int main()
 		{
 			ImGui::SetNextWindowSize(ImVec2());
 			ImGui::Begin(u8"Настройки", (bool*)0, ImGuiWindowFlags_NoResize);
-
+			{
 				ImGui::SliderInt(u8"Цвет сетки", &grid_col, 0, 255);
 				ImGui::Separator();
 
@@ -185,7 +192,7 @@ int main()
 					precision = 1.0 / (double)precision_points;
 					isCalculateBezier = true;
 				}
-
+			}
 			ImGui::End();
 		}
 

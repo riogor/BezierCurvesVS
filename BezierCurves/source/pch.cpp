@@ -8,7 +8,7 @@ const int base_radius      = 10;
 const int step_size        = 25;
 int       grid_col         = 55;
 double    precision        = 0.0005;
-int       precision_points = 1.0 / precision;
+int       precision_points = (int)(1.0 / precision);
 
 vector<pointI>         basepoints   = {};
 vector<pointD>         tmppoints    = {};

@@ -19,7 +19,7 @@ ostream& operator<<(ostream& out, pair<T, V>& p)
 	return out;
 }
 
-bool readFromFile(string path)
+bool readFromFile(char* path)
 {
 	ifstream in;
 	in.open(path);
@@ -53,10 +53,13 @@ bool readFromFile(string path)
 	return true;
 }
 
-void saveInFile(string path)
+bool saveInFile(char* path)
 {
 	ofstream out;
 	out.open(path);
+
+	if (!out.is_open())
+		return false;
 
 	out << bezierType << endl << basepoints.size() << endl;
 	
@@ -64,4 +67,6 @@ void saveInFile(string path)
 		out << p << endl;
 
 	out.close();
+
+	return true;
 }

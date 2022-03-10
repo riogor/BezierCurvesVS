@@ -11,6 +11,16 @@ void renderCircle(const int x, const int y, const int radius)
 	glEnd();
 }
 
+void renderCircle(const double x, const double y, const int radius)
+{
+	glPointSize(radius);
+	glBegin(GL_POINTS);
+
+	glVertex2d(x, y);
+
+	glEnd();
+}
+
 void renderGrid(const int gap)
 {
 	glLineWidth(1);
@@ -72,13 +82,13 @@ void renderSubbezier()
 	srand(0x12e15e35b500f16e);
 
 	int stacked = basepoints.size();
-	for (auto layer = basepoints.size() - 1; layer > 1; --layer)
+	for (int layer = basepoints.size() - 1; layer > 1; --layer)
 	{
 		glColor3ub(rand() % 255, rand() % 255, rand() % 255);
 		glBegin(GL_LINE_STRIP);
 
 		for (int point = stacked; point < (stacked + layer); ++point)
-			glVertex2i(tmppoints[point].first, tmppoints[point].second);
+			glVertex2d(tmppoints[point].first, tmppoints[point].second);
 
 		glEnd();
 
