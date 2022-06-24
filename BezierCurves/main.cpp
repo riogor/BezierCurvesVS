@@ -4,6 +4,8 @@
 #include <files.h>
 #include <localization.h>
 
+#include <Roboto.font.h>
+
 vector<ImFont*> lang_fonts;
 
 using localization::getLocStr;
@@ -44,9 +46,9 @@ int main()
 	io.IniFilename = nullptr;
 
 	io.Fonts->Clear();
-	lang_fonts = {io.Fonts->AddFontFromFileTTF("fonts/Roboto-Bold.ttf", 16.f),      //Eng
-				  io.Fonts->AddFontFromFileTTF("fonts/Roboto-Bold.ttf", 16.f, NULL, //Rus
-					  ImGui::GetIO().Fonts->GetGlyphRangesCyrillic()) };
+	lang_fonts = { io.Fonts->AddFontFromMemoryCompressedBase85TTF(robotoFont_compressed_base85, 16.f),
+	               io.Fonts->AddFontFromMemoryCompressedBase85TTF(robotoFont_compressed_base85, 16.f,
+	               NULL, ImGui::GetIO().Fonts->GetGlyphRangesCyrillic()) };
 	io.Fonts->Build();
 
 	ImGui_ImplGlfw_InitForOpenGL(window, true);
