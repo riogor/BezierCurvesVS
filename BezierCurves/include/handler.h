@@ -1,5 +1,4 @@
 #pragma once
-
 #include "pch.h"
 
 void error(int error, const char* description);

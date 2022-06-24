@@ -1,4 +1,5 @@
 #include "pch.h"
+
 #include "calc.h"
 
 decltype(basepoints.end()) findPointOnClickPos(const int x, const int y, const int radius)

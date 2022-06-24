@@ -2,6 +2,8 @@
 
 #include <iostream>
 #include <vector>
+#include <map>
+#include <string>
 
 #include <imgui.h>
 #include <imgui_impl_glfw.h>
@@ -12,8 +14,8 @@
 
 using namespace std;
 
-extern bool  isRenderGrid;
-extern bool  isRenderBase;
+extern bool isRenderGrid;
+extern bool isRenderBase;
 
 extern const int max_field;   // maximum screen amount (field size: width*maxfield*2, height*maxfield*2)
 extern const int base_radius; // radius of point on screen
@@ -38,3 +40,5 @@ extern int   bezierType;        // 1 - normal, 2 - quadratic (spline), 3 - cubic
 extern bool  isRenderSubbezier;
 extern bool  isCalculateBezier;
 extern float subbezierT;        // T variable for rendering subbezier
+
+extern int language; //0 - english, 1 - russian

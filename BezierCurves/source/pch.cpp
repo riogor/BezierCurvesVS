@@ -1,7 +1,7 @@
 #include "pch.h"
 
-bool  isRenderGrid      = true;
-bool  isRenderBase      = true;
+bool isRenderGrid = true;
+bool isRenderBase = true;
 
 const int max_field        = 5;
 const int base_radius      = 10;
@@ -23,3 +23,5 @@ int   bezierType        = 1;
 bool  isCalculateBezier = true;
 bool  isRenderSubbezier = false;
 float subbezierT        = 0.5f;
+
+int language = 1;

@@ -1,4 +1,5 @@
 #include "pch.h"
+
 #include "render.h"
 
 void renderCircle(const int x, const int y, const int radius)
